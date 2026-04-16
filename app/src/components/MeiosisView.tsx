@@ -36,13 +36,13 @@ export default function MeiosisView({ genes, parentAlleles, t }: Props) {
   const stage = STAGES[stageIndex];
 
   // Get alleles for a gene, respecting random orientation for independent assortment
-  const getOrientedAlleles = (geneIndex: number): [string, string] => {
+  const getOrientedAlleles = useCallback((geneIndex: number): [string, string] => {
     const pair = parentAlleles[geneIndex];
     const a1 = pair?.[0] || '?';
     const a2 = pair?.[1] || '?';
     if (orientations[geneIndex]) return [a2, a1];
     return [a1, a2];
-  };
+  }, [parentAlleles, orientations]);
 
   const nextStage = useCallback(() => {
     setStageIndex((i) => {
@@ -293,7 +293,7 @@ export default function MeiosisView({ genes, parentAlleles, t }: Props) {
     ctx.font = 'bold 14px sans-serif';
     ctx.textAlign = 'center';
     ctx.fillText((t.meiosis as Record<string, string>)[stage], w / 2, 25);
-  }, [stage, genes, parentAlleles, orientations, t]);
+  }, [stage, genes, parentAlleles, orientations, getOrientedAlleles, t]);
 
   // Re-randomize orientations when genes change
   useEffect(() => {
