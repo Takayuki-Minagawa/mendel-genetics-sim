@@ -27,10 +27,22 @@ export default function MeiosisView({ genes, parentAlleles, t }: Props) {
   const [stageIndex, setStageIndex] = useState(0);
   const [playing, setPlaying] = useState(false);
   const [speed, setSpeed] = useState(1);
+  const [orientations, setOrientations] = useState<boolean[]>(() =>
+    genes.map(() => Math.random() < 0.5)
+  );
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const progressRef = useRef(0);
 
   const stage = STAGES[stageIndex];
+
+  // Get alleles for a gene, respecting random orientation for independent assortment
+  const getOrientedAlleles = (geneIndex: number): [string, string] => {
+    const pair = parentAlleles[geneIndex];
+    const a1 = pair?.[0] || '?';
+    const a2 = pair?.[1] || '?';
+    if (orientations[geneIndex]) return [a2, a1];
+    return [a1, a2];
+  };
 
   const nextStage = useCallback(() => {
     setStageIndex((i) => {
@@ -169,20 +181,18 @@ export default function MeiosisView({ genes, parentAlleles, t }: Props) {
       for (let i = 0; i < numGenes; i++) {
         const yOff = (i - (numGenes - 1) / 2) * (chromLen + 20);
         const color = CHROMOSOME_COLORS[i % CHROMOSOME_COLORS.length];
-        const a1 = parentAlleles[i]?.[0] || '?';
-        const a2 = parentAlleles[i]?.[1] || '?';
-        drawChromosome(w / 2 - 18, h / 2 + yOff, chromLen, color, a1, true);
-        drawChromosome(w / 2 + 18, h / 2 + yOff, chromLen, color, a2, true);
+        const [left, right] = getOrientedAlleles(i);
+        drawChromosome(w / 2 - 18, h / 2 + yOff, chromLen, color, left, true);
+        drawChromosome(w / 2 + 18, h / 2 + yOff, chromLen, color, right, true);
       }
     } else if (stage === 'anaphase1') {
       drawCell(w / 2, h / 2, 120, 90);
       for (let i = 0; i < numGenes; i++) {
         const yOff = (i - (numGenes - 1) / 2) * (chromLen + 20);
         const color = CHROMOSOME_COLORS[i % CHROMOSOME_COLORS.length];
-        const a1 = parentAlleles[i]?.[0] || '?';
-        const a2 = parentAlleles[i]?.[1] || '?';
-        drawChromosome(w / 2 - 50, h / 2 + yOff, chromLen, color, a1, true);
-        drawChromosome(w / 2 + 50, h / 2 + yOff, chromLen, color, a2, true);
+        const [left, right] = getOrientedAlleles(i);
+        drawChromosome(w / 2 - 50, h / 2 + yOff, chromLen, color, left, true);
+        drawChromosome(w / 2 + 50, h / 2 + yOff, chromLen, color, right, true);
       }
       // Arrows
       ctx.fillStyle = '#9CA3AF';
@@ -202,10 +212,9 @@ export default function MeiosisView({ genes, parentAlleles, t }: Props) {
       for (let i = 0; i < numGenes; i++) {
         const yOff = (i - (numGenes - 1) / 2) * (chromLen + 15);
         const color = CHROMOSOME_COLORS[i % CHROMOSOME_COLORS.length];
-        const a1 = parentAlleles[i]?.[0] || '?';
-        const a2 = parentAlleles[i]?.[1] || '?';
-        drawChromosome(w / 2 - 60, h / 2 + yOff, chromLen * 0.8, color, a1, true);
-        drawChromosome(w / 2 + 60, h / 2 + yOff, chromLen * 0.8, color, a2, true);
+        const [left, right] = getOrientedAlleles(i);
+        drawChromosome(w / 2 - 60, h / 2 + yOff, chromLen * 0.8, color, left, true);
+        drawChromosome(w / 2 + 60, h / 2 + yOff, chromLen * 0.8, color, right, true);
       }
     } else if (stage === 'metaphase2') {
       drawCell(w / 2 - 70, h / 2, 50, 65);
@@ -213,10 +222,9 @@ export default function MeiosisView({ genes, parentAlleles, t }: Props) {
       for (let i = 0; i < numGenes; i++) {
         const yOff = (i - (numGenes - 1) / 2) * (chromLen + 15);
         const color = CHROMOSOME_COLORS[i % CHROMOSOME_COLORS.length];
-        const a1 = parentAlleles[i]?.[0] || '?';
-        const a2 = parentAlleles[i]?.[1] || '?';
-        drawChromosome(w / 2 - 70, h / 2 + yOff, chromLen * 0.8, color, a1, true);
-        drawChromosome(w / 2 + 70, h / 2 + yOff, chromLen * 0.8, color, a2, true);
+        const [left, right] = getOrientedAlleles(i);
+        drawChromosome(w / 2 - 70, h / 2 + yOff, chromLen * 0.8, color, left, true);
+        drawChromosome(w / 2 + 70, h / 2 + yOff, chromLen * 0.8, color, right, true);
       }
     } else if (stage === 'anaphase2') {
       drawCell(w / 2 - 80, h / 2, 50, 65);
@@ -224,14 +232,13 @@ export default function MeiosisView({ genes, parentAlleles, t }: Props) {
       for (let i = 0; i < numGenes; i++) {
         const yOff = (i - (numGenes - 1) / 2) * (chromLen + 15);
         const color = CHROMOSOME_COLORS[i % CHROMOSOME_COLORS.length];
-        const a1 = parentAlleles[i]?.[0] || '?';
-        const a2 = parentAlleles[i]?.[1] || '?';
+        const [left, right] = getOrientedAlleles(i);
         // Left cell splits
-        drawChromosome(w / 2 - 95, h / 2 + yOff, chromLen * 0.7, color, a1, false);
-        drawChromosome(w / 2 - 65, h / 2 + yOff, chromLen * 0.7, color, a1, false);
+        drawChromosome(w / 2 - 95, h / 2 + yOff, chromLen * 0.7, color, left, false);
+        drawChromosome(w / 2 - 65, h / 2 + yOff, chromLen * 0.7, color, left, false);
         // Right cell splits
-        drawChromosome(w / 2 + 65, h / 2 + yOff, chromLen * 0.7, color, a2, false);
-        drawChromosome(w / 2 + 95, h / 2 + yOff, chromLen * 0.7, color, a2, false);
+        drawChromosome(w / 2 + 65, h / 2 + yOff, chromLen * 0.7, color, right, false);
+        drawChromosome(w / 2 + 95, h / 2 + yOff, chromLen * 0.7, color, right, false);
       }
     } else if (stage === 'telophase2') {
       drawCell(w / 2 - 100, h / 2, 35, 50);
@@ -241,12 +248,11 @@ export default function MeiosisView({ genes, parentAlleles, t }: Props) {
       for (let i = 0; i < numGenes; i++) {
         const yOff = (i - (numGenes - 1) / 2) * (chromLen + 10);
         const color = CHROMOSOME_COLORS[i % CHROMOSOME_COLORS.length];
-        const a1 = parentAlleles[i]?.[0] || '?';
-        const a2 = parentAlleles[i]?.[1] || '?';
-        drawChromosome(w / 2 - 100, h / 2 + yOff, chromLen * 0.6, color, a1, false);
-        drawChromosome(w / 2 - 50, h / 2 + yOff, chromLen * 0.6, color, a1, false);
-        drawChromosome(w / 2 + 50, h / 2 + yOff, chromLen * 0.6, color, a2, false);
-        drawChromosome(w / 2 + 100, h / 2 + yOff, chromLen * 0.6, color, a2, false);
+        const [left, right] = getOrientedAlleles(i);
+        drawChromosome(w / 2 - 100, h / 2 + yOff, chromLen * 0.6, color, left, false);
+        drawChromosome(w / 2 - 50, h / 2 + yOff, chromLen * 0.6, color, left, false);
+        drawChromosome(w / 2 + 50, h / 2 + yOff, chromLen * 0.6, color, right, false);
+        drawChromosome(w / 2 + 100, h / 2 + yOff, chromLen * 0.6, color, right, false);
       }
     } else if (stage === 'gametes') {
       const positions = [
@@ -262,12 +268,11 @@ export default function MeiosisView({ genes, parentAlleles, t }: Props) {
       for (let i = 0; i < numGenes; i++) {
         const yOff = (i - (numGenes - 1) / 2) * (chromLen * 0.6 + 8);
         const color = CHROMOSOME_COLORS[i % CHROMOSOME_COLORS.length];
-        const a1 = parentAlleles[i]?.[0] || '?';
-        const a2 = parentAlleles[i]?.[1] || '?';
-        drawChromosome(positions[0].x, positions[0].y + yOff, chromLen * 0.5, color, a1, false);
-        drawChromosome(positions[1].x, positions[1].y + yOff, chromLen * 0.5, color, a1, false);
-        drawChromosome(positions[2].x, positions[2].y + yOff, chromLen * 0.5, color, a2, false);
-        drawChromosome(positions[3].x, positions[3].y + yOff, chromLen * 0.5, color, a2, false);
+        const [left, right] = getOrientedAlleles(i);
+        drawChromosome(positions[0].x, positions[0].y + yOff, chromLen * 0.5, color, left, false);
+        drawChromosome(positions[1].x, positions[1].y + yOff, chromLen * 0.5, color, left, false);
+        drawChromosome(positions[2].x, positions[2].y + yOff, chromLen * 0.5, color, right, false);
+        drawChromosome(positions[3].x, positions[3].y + yOff, chromLen * 0.5, color, right, false);
       }
 
       // Labels
@@ -276,8 +281,8 @@ export default function MeiosisView({ genes, parentAlleles, t }: Props) {
       ctx.textAlign = 'center';
       for (let gi = 0; gi < 4; gi++) {
         const alleles = genes.map((_, i) => {
-          const pair = parentAlleles[i];
-          return gi < 2 ? pair[0] : pair[1];
+          const [left, right] = getOrientedAlleles(i);
+          return gi < 2 ? left : right;
         });
         ctx.fillText(alleles.join(''), positions[gi].x, positions[gi].y + 45);
       }
@@ -288,12 +293,18 @@ export default function MeiosisView({ genes, parentAlleles, t }: Props) {
     ctx.font = 'bold 14px sans-serif';
     ctx.textAlign = 'center';
     ctx.fillText((t.meiosis as Record<string, string>)[stage], w / 2, 25);
-  }, [stage, genes, parentAlleles, t]);
+  }, [stage, genes, parentAlleles, orientations, t]);
+
+  // Re-randomize orientations when genes change
+  useEffect(() => {
+    setOrientations(genes.map(() => Math.random() < 0.5));
+  }, [genes]);
 
   const handleReset = () => {
     setStageIndex(0);
     setPlaying(false);
     progressRef.current = 0;
+    setOrientations(genes.map(() => Math.random() < 0.5));
   };
 
   return (

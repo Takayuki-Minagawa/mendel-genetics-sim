@@ -44,16 +44,14 @@ const bloodTypeGene: Gene = {
   alleles: [
     { symbol: 'A', dominant: true, displayName: 'I^A' },
     { symbol: 'B', dominant: true, displayName: 'I^B' },
+    { symbol: 'O', dominant: false, displayName: 'i' },
   ],
   phenotypeMap: {
     AA: 'A型',
     AO: 'A型',
-    OA: 'A型',
+    AB: 'AB型',
     BB: 'B型',
     BO: 'B型',
-    OB: 'B型',
-    AB: 'AB型',
-    BA: 'AB型',
     OO: 'O型',
   },
   phenotypeColorMap: {
@@ -62,15 +60,6 @@ const bloodTypeGene: Gene = {
     'AB型': '#8B5CF6',
     'O型': '#6B7280',
   },
-};
-
-// For blood type, we need a special gene with 3 alleles
-const bloodTypeGeneSpecial: Gene = {
-  ...bloodTypeGene,
-  alleles: [
-    { symbol: 'A', dominant: true, displayName: 'I^A' },
-    { symbol: 'O', dominant: false, displayName: 'i' },
-  ],
 };
 
 export const presets: Preset[] = [
@@ -91,9 +80,9 @@ export const presets: Preset[] = [
   {
     id: 'bloodType',
     nameKey: 'bloodType',
-    genes: [bloodTypeGeneSpecial],
+    genes: [bloodTypeGene],
     parent1: [['A', 'O']],
-    parent2: [['A', 'O']],
+    parent2: [['B', 'O']],
   },
   {
     id: 'dihybrid',

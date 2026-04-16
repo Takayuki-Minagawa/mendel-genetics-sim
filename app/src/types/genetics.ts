@@ -7,7 +7,7 @@ export interface Allele {
 export interface Gene {
   name: string;
   locus: string;
-  alleles: [Allele, Allele]; // two possible alleles
+  alleles: Allele[];
   phenotypeMap: Record<string, string>; // genotype string -> phenotype
   phenotypeColorMap: Record<string, string>; // phenotype -> color
 }

@@ -59,9 +59,10 @@ export function crossGametes(
     const a1 = g1.alleles[i].allele;
     const a2 = g2.alleles[i].allele;
     const pair: AllelePair = [a1, a2];
-    genotypeParts.push(a1 + a2);
-    phenotypeParts.push(getPhenotype(genes[i], pair));
-    colors.push(getPhenotypeColor(genes[i], pair));
+    const normalized = normalizeAllelePair(pair);
+    genotypeParts.push(normalized[0] + normalized[1]);
+    phenotypeParts.push(getPhenotype(genes[i], normalized));
+    colors.push(getPhenotypeColor(genes[i], normalized));
   }
 
   return {

@@ -20,14 +20,14 @@ export default function ParentSettings({
   t,
 }: Props) {
   const uniqueGenotypes = (gene: Gene): AllelePair[] => {
-    const a = gene.alleles[0].symbol;
-    const b = gene.alleles[1].symbol;
-    if (a === b) return [[a, b]];
-    return [
-      [a, a],
-      [a, b],
-      [b, b],
-    ];
+    const symbols = gene.alleles.map((a) => a.symbol);
+    const pairs: AllelePair[] = [];
+    for (let i = 0; i < symbols.length; i++) {
+      for (let j = i; j < symbols.length; j++) {
+        pairs.push([symbols[i], symbols[j]]);
+      }
+    }
+    return pairs;
   };
 
   const handleAlleleChange = (
