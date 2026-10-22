@@ -90,7 +90,7 @@ function ConvergenceChart({
 }
 
 export default function TrialMode({ genes, parent1Alleles, parent2Alleles, t, lang, mendelData }: Props) {
-  const { addXp, unlock } = useProgress();
+  const { addXp, unlock, markOnce, state } = useProgress();
   const [count, setCount] = useState(100);
   const [prediction, setPrediction] = useState(50);
   const [locked, setLocked] = useState(false);
@@ -123,10 +123,12 @@ export default function TrialMode({ genes, parent1Alleles, parent2Alleles, t, la
   }, [configKey]);
 
   const finish = (result: RunResult) => {
-    addXp(3, t.trial.xpRun);
+    // XP is paid once per cross so repeated runs cannot be farmed
+    if (markOnce('trialRun', configKey)) addXp(3, t.trial.xpRun);
     if (result.n >= 10000) unlock('bigData');
     if (result.mendel) unlock('mendelReplica');
-    if (result.prediction !== null) {
+    setLocked(false);
+    if (result.prediction !== null && markOnce('trialPrediction', configKey)) {
       const diff = Math.abs(result.prediction - targetPct);
       if (diff <= 2) {
         unlock('sharpshooter');
@@ -207,6 +209,9 @@ export default function TrialMode({ genes, parent1Alleles, parent2Alleles, t, la
         >
           <p className="text-xs font-bold text-violet-500 mb-1">STEP 1</p>
           <h3 className="font-bold text-slate-800 dark:text-slate-100 mb-3">🔮 {t.trial.predictTitle}</h3>
+          {state.seen.trialPrediction?.includes(configKey) && (
+            <p className="-mt-2 mb-3 text-xs text-slate-500 dark:text-slate-400">✔ {t.trial.bonusUsed}</p>
+          )}
           {target && (
             <>
               <div className="flex items-center gap-3 mb-3">
@@ -342,7 +347,7 @@ export default function TrialMode({ genes, parent1Alleles, parent2Alleles, t, la
                         </span>
                       </div>
                       <div className="relative h-4 rounded-full bg-slate-200 dark:bg-slate-700 overflow-hidden">
-                        <div className="absolute inset-y-0 left-0 rounded-full" style={{ width: `${obs * 100}%`, backgroundColor: color }} />
+                        <div className="absolute inset-y-0 left-0 rounded-full ring-1 ring-inset ring-black/15" style={{ width: `${obs * 100}%`, backgroundColor: color }} />
                         <div
                           className="absolute inset-y-0 w-0.5 bg-slate-900 dark:bg-white"
                           style={{ left: `${e.count * 100}%` }}

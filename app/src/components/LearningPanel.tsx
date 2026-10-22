@@ -58,7 +58,11 @@ export default function LearningPanel({ genes, parent1Alleles, parent2Alleles, t
       const gene = genes[0];
       const recessive = gene.alleles[gene.alleles.length - 1].symbol;
       const isRecHomo = (x: AllelePair) => x[0] === recessive && x[1] === recessive;
-      if (homoA && homoB && a[0] !== b[0]) interp = gene.inheritance === 'incomplete' ? t.learn.interpPureIncomplete : t.learn.interpPure;
+      if (homoA && homoB && a[0] !== b[0]) {
+        if (gene.inheritance === 'incomplete') interp = t.learn.interpPureIncomplete;
+        else if (gene.inheritance === 'codominant' && !isRecHomo(a) && !isRecHomo(b)) interp = t.learn.interpPureCodominant;
+        else interp = t.learn.interpPure;
+      }
       else if (!homoA && !homoB && a.join() === b.join()) {
         interp =
           gene.inheritance === 'incomplete'

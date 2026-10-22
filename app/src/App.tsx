@@ -121,7 +121,7 @@ function AppContent({
             <button
               onClick={toggleLanguage}
               className="w-9 h-9 rounded-full bg-white/20 hover:bg-white/30 text-white text-xs font-bold"
-              aria-label="Language"
+              aria-label={language === 'ja' ? 'Switch to English' : '日本語に切り替え'}
             >
               {language === 'ja' ? 'EN' : 'JA'}
             </button>

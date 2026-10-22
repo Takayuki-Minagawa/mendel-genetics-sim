@@ -45,8 +45,8 @@ export default function OrganismIcon({ genes, phenotypeIds, size = 40, className
     height: size,
     viewBox: '0 0 100 100',
     className,
-    role: 'img' as const,
-    'aria-label': title,
+    // Decorative unless a title is given
+    ...(title ? { role: 'img' as const, 'aria-label': title } : { 'aria-hidden': true as const }),
   };
 
   if (lethal) {

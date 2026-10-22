@@ -63,7 +63,7 @@ export default function ParentSettings({ genes, parent1Alleles, parent2Alleles, 
           return (
             <div key={gene.id} className="mb-2 last:mb-0">
               <p className="text-xs text-slate-500 dark:text-slate-400 mb-1">
-                {gene.name[lang]}（{gene.locus}）
+                {lang === 'ja' ? `${gene.name.ja}（${gene.locus}）` : `${gene.name.en} (${gene.locus})`}
               </p>
               <div className="flex flex-wrap gap-1.5" role="radiogroup" aria-label={gene.name[lang]}>
                 {possibleGenotypes(gene).map((pair) => {

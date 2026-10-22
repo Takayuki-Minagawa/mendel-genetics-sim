@@ -158,12 +158,16 @@ export default function GenotypeDetective({ t, lang }: Props) {
       {!solved ? (
         <div>
           <p className="text-sm font-bold text-slate-700 dark:text-slate-200 mb-2">🕵️ {t.detective.accuse}</p>
+          {crosses.length === 0 && (
+            <p className="text-xs text-slate-500 dark:text-slate-400 mb-2">{t.detective.needEvidence}</p>
+          )}
           <div className="flex gap-3">
             {[homo, het].map((pair) => (
               <button
                 key={pair.join('')}
                 onClick={() => handleGuess(pair)}
-                className="flex-1 py-3 rounded-xl border-2 border-indigo-300 dark:border-indigo-700 bg-white dark:bg-slate-900 font-mono text-2xl font-black text-indigo-600 dark:text-indigo-300 hover:bg-indigo-50 dark:hover:bg-indigo-950 hover:-translate-y-0.5 transition-all"
+                disabled={crosses.length === 0}
+                className="flex-1 py-3 rounded-xl border-2 border-indigo-300 dark:border-indigo-700 bg-white dark:bg-slate-900 font-mono text-2xl font-black text-indigo-600 dark:text-indigo-300 hover:bg-indigo-50 dark:hover:bg-indigo-950 hover:-translate-y-0.5 transition-all disabled:opacity-40 disabled:pointer-events-none"
               >
                 {pair.join('')}
               </button>

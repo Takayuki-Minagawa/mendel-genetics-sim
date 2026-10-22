@@ -1,4 +1,4 @@
-import { useEffect } from 'react';
+import { useEffect, useRef } from 'react';
 import type { Language } from '../types/genetics';
 import type { TranslationKeys } from '../i18n/translations';
 import { fmt } from '../i18n/translations';
@@ -17,6 +17,12 @@ export default function AchievementsModal({ onClose, t, lang }: Props) {
   const progress = levelInfo.nextXp
     ? ((state.xp - levelInfo.minXp) / (levelInfo.nextXp - levelInfo.minXp)) * 100
     : 100;
+
+  const closeRef = useRef<HTMLButtonElement>(null);
+
+  useEffect(() => {
+    closeRef.current?.focus();
+  }, []);
 
   useEffect(() => {
     const onKey = (e: KeyboardEvent) => e.key === 'Escape' && onClose();
@@ -49,6 +55,7 @@ export default function AchievementsModal({ onClose, t, lang }: Props) {
               </p>
             </div>
             <button
+              ref={closeRef}
               onClick={onClose}
               className="w-9 h-9 rounded-full bg-white/20 hover:bg-white/30 text-lg"
               aria-label={t.progress.close}

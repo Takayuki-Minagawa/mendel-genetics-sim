@@ -18,6 +18,8 @@ export interface ProgressApi {
   bump: (stat: string, by?: number) => number;
   // Adds a value to a named set and returns the set size
   markSeen: (set: string, value: string) => number;
+  // Like markSeen, but returns true only the first time a value is added
+  markOnce: (set: string, value: string) => boolean;
   celebrate: () => void;
   reset: () => void;
 }

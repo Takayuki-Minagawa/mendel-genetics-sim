@@ -9,6 +9,12 @@ const BADGE_XP = 30;
 
 const emptyState = (): ProgressState => ({ xp: 0, badges: [], stats: {}, seen: {} });
 
+// Keeps only well-formed entries, so old or corrupted saves cannot crash the app
+function sanitizeRecord<T>(value: unknown, isValid: (v: unknown) => v is T): Record<string, T> {
+  if (!value || typeof value !== 'object' || Array.isArray(value)) return {};
+  return Object.fromEntries(Object.entries(value).filter(([, v]) => isValid(v))) as Record<string, T>;
+}
+
 function loadState(): ProgressState {
   try {
     const raw = localStorage.getItem(STORAGE_KEY);
@@ -16,9 +22,11 @@ function loadState(): ProgressState {
     const parsed = JSON.parse(raw) as Partial<ProgressState>;
     return {
       xp: typeof parsed.xp === 'number' ? parsed.xp : 0,
-      badges: Array.isArray(parsed.badges) ? parsed.badges : [],
-      stats: parsed.stats ?? {},
-      seen: parsed.seen ?? {},
+      badges: Array.isArray(parsed.badges)
+        ? parsed.badges.filter((b): b is AchievementId => achievements.some((a) => a.id === b))
+        : [],
+      stats: sanitizeRecord(parsed.stats, (v): v is number => typeof v === 'number'),
+      seen: sanitizeRecord(parsed.seen, (v): v is string[] => Array.isArray(v) && v.every((x) => typeof x === 'string')),
     };
   } catch {
     return emptyState();
@@ -140,13 +148,21 @@ export default function ProgressProvider({ language, children }: Props) {
     [commit]
   );
 
+  const markOnce = useCallback(
+    (set: string, value: string) => {
+      const before = stateRef.current.seen[set]?.length ?? 0;
+      return markSeen(set, value) > before;
+    },
+    [markSeen]
+  );
+
   const reset = useCallback(() => {
     commit(emptyState());
   }, [commit]);
 
   const api: ProgressApi = useMemo(
-    () => ({ state, levelInfo: levelFor(state.xp), addXp, unlock, bump, markSeen, celebrate, reset }),
-    [state, addXp, unlock, bump, markSeen, celebrate, reset]
+    () => ({ state, levelInfo: levelFor(state.xp), addXp, unlock, bump, markSeen, markOnce, celebrate, reset }),
+    [state, addXp, unlock, bump, markSeen, markOnce, celebrate, reset]
   );
 
   return (
@@ -160,7 +176,7 @@ export default function ProgressProvider({ language, children }: Props) {
         {toasts.map((t) => (
           <div
             key={t.id}
-            className={`animate-toast-in pointer-events-auto flex items-center gap-3 rounded-2xl px-4 py-3 shadow-lg border sm:max-w-sm ${
+            className={`animate-toast-in flex items-center gap-3 rounded-2xl px-4 py-3 shadow-lg border sm:max-w-sm ${
               t.kind === 'xp'
                 ? 'bg-white/95 dark:bg-slate-800/95 border-emerald-200 dark:border-emerald-700'
                 : t.kind === 'level'

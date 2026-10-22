@@ -12,7 +12,14 @@ interface Props {
 
 const ROUND_SIZE = 8;
 
-const newRound = (): QuizQuestion[] => shuffle(quizQuestions).slice(0, ROUND_SIZE);
+// Shuffles questions and their options so answers can't be memorized by position
+const newRound = (): QuizQuestion[] =>
+  shuffle(quizQuestions)
+    .slice(0, ROUND_SIZE)
+    .map((q) => {
+      const order = shuffle(q.options.map((_, i) => i));
+      return { ...q, options: order.map((i) => q.options[i]), correctIndex: order.indexOf(q.correctIndex) };
+    });
 
 export default function QuizGame({ t, lang }: Props) {
   const { addXp, unlock, celebrate } = useProgress();

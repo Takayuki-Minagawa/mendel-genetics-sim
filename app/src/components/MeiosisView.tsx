@@ -192,7 +192,7 @@ function lerpLayout(from: Layout, to: Layout, p: number): Layout {
 const easeInOut = (p: number) => (p < 0.5 ? 4 * p * p * p : 1 - Math.pow(-2 * p + 2, 3) / 2);
 
 export default function MeiosisView({ genes, parent1Alleles, parent2Alleles, t, lang, theme }: Props) {
-  const { unlock, addXp } = useProgress();
+  const { unlock, addXp, markOnce } = useProgress();
   const [parentIndex, setParentIndex] = useState<0 | 1>(0);
   const parentAlleles = parentIndex === 0 ? parent1Alleles : parent2Alleles;
   const [stageIndex, setStageIndex] = useState(0);
@@ -255,12 +255,12 @@ export default function MeiosisView({ genes, parent1Alleles, parent2Alleles, t, 
     if (stage !== 'gametes' || rewardedRun.current === runId) return;
     rewardedRun.current = runId;
     unlock('meiosisMaster');
-    addXp(10, lang === 'ja' ? '減数分裂を観察' : 'Observed meiosis');
+    if (markOnce('meiosis', configKey)) addXp(10, t.meiosis.xpObserved);
     const next = { ...tally };
     gameteLabels.forEach((g) => (next[g] = (next[g] ?? 0) + 1));
     setTally(next);
     if (genes.length === 2 && Object.keys(next).length >= 4) unlock('assortment');
-  }, [stage, runId, unlock, addXp, lang, gameteLabels, genes.length, tally]);
+  }, [stage, runId, unlock, addXp, markOnce, configKey, t, gameteLabels, genes.length, tally]);
 
   // Track canvas width
   useEffect(() => {

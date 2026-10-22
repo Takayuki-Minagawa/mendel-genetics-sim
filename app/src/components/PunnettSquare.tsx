@@ -228,7 +228,7 @@ export default function PunnettSquare({ genes, parent1Alleles, parent2Alleles, t
                   <span className="text-xs w-24 truncate text-slate-700 dark:text-slate-300">{phenotypeLabel(genes, e.key, lang)}</span>
                   <div className="flex-1 bg-slate-200 dark:bg-slate-700 rounded-full h-3 overflow-hidden">
                     <div
-                      className="h-full rounded-full transition-all duration-700"
+                      className="h-full rounded-full transition-all duration-700 ring-1 ring-inset ring-black/15"
                       style={{ width: `${ratio * 100}%`, backgroundColor: phenotypeColor(genes, e.key) }}
                     />
                   </div>
