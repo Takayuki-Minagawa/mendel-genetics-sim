@@ -1,40 +1,63 @@
-export interface Allele {
-  symbol: string;
-  dominant: boolean;
-  displayName?: string;
+export type Language = 'ja' | 'en';
+
+export interface Localized {
+  ja: string;
+  en: string;
 }
 
+export interface Allele {
+  symbol: string;
+}
+
+export interface Phenotype {
+  id: string;
+  name: Localized;
+  color: string;
+  lethal?: boolean;
+}
+
+export type Trait = 'seedColor' | 'seedShape' | 'flowerColor' | 'bloodType' | 'furColor';
+
+export type Inheritance = 'complete' | 'incomplete' | 'codominant' | 'lethal';
+
 export interface Gene {
-  name: string;
+  id: string;
   locus: string;
+  trait: Trait;
+  name: Localized;
+  inheritance: Inheritance;
+  // Alleles are listed in dominance order; genotypes are normalized to this order.
   alleles: Allele[];
-  phenotypeMap: Record<string, string>; // genotype string -> phenotype
-  phenotypeColorMap: Record<string, string>; // phenotype -> color
+  // normalized genotype string (e.g. "Yy") -> phenotype id
+  phenotypeMap: Record<string, string>;
+  phenotypes: Record<string, Phenotype>;
 }
 
 export type AllelePair = [string, string];
 
-export interface Genotype {
-  genes: { gene: Gene; alleles: AllelePair }[];
-}
-
 export interface Gamete {
-  alleles: { gene: Gene; allele: string }[];
+  alleles: string[];
 }
 
-export interface CrossResult {
+export interface Offspring {
+  pairs: AllelePair[];
   genotype: string;
-  phenotype: string;
-  color: string;
-  probability: number;
+  phenotypeIds: string[];
+  // Phenotype ids joined with "|", used as a grouping key
+  key: string;
+  lethal: boolean;
 }
 
 export interface Preset {
   id: string;
-  nameKey: string;
+  icon: string;
+  name: Localized;
+  description: Localized;
   genes: Gene[];
   parent1: AllelePair[];
   parent2: AllelePair[];
+  // Mendel's published F2 counts, keyed by phenotype key
+  mendelData?: Record<string, number>;
 }
 
 export type MeiosisStage =

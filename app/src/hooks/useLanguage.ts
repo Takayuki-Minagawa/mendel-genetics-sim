@@ -1,4 +1,4 @@
-import { useState, useCallback } from 'react';
+import { useState, useCallback, useEffect } from 'react';
 import translations from '../i18n/translations';
 import type { Language, TranslationKeys } from '../i18n/translations';
 
@@ -8,6 +8,10 @@ export function useLanguage() {
     if (saved === 'ja' || saved === 'en') return saved;
     return 'ja';
   });
+
+  useEffect(() => {
+    document.documentElement.lang = language;
+  }, [language]);
 
   const toggleLanguage = useCallback(() => {
     setLanguage((l) => {
