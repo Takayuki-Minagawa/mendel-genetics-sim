@@ -92,7 +92,7 @@ export const achievements: Achievement[] = [
     id: 'detectivePro',
     icon: '🕵️',
     name: { ja: '迷宮入りなし', en: 'No Cold Cases' },
-    description: { ja: '遺伝子型探偵で5件解決した', en: 'Solved 5 Genotype Detective cases' },
+    description: { ja: '遺伝子型探偵で、証拠にもとづく推理で5件解決した', en: 'Solved 5 Genotype Detective cases with solid evidence' },
   },
   {
     id: 'puzzleSolver',

@@ -70,7 +70,8 @@ export default function GenotypeDetective({ t, lang }: Props) {
     const solid = hiddenIsHet ? sawRecessive : all.length >= 8;
     addXp(solid ? 25 : 10, solid ? t.detective.xpSolid : t.detective.xpLucky);
     unlock('detective');
-    if (bump('detectiveSolved') >= 5) unlock('detectivePro');
+    // Only evidence-based solves count toward the 5-case badge
+    if (solid && bump('detectiveSolved') >= 5) unlock('detectivePro');
   };
 
   const nextCase = () => {

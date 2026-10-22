@@ -23,7 +23,7 @@ function loadState(): ProgressState {
     return {
       xp: typeof parsed.xp === 'number' ? parsed.xp : 0,
       badges: Array.isArray(parsed.badges)
-        ? parsed.badges.filter((b): b is AchievementId => achievements.some((a) => a.id === b))
+        ? [...new Set(parsed.badges)].filter((b): b is AchievementId => achievements.some((a) => a.id === b))
         : [],
       stats: sanitizeRecord(parsed.stats, (v): v is number => typeof v === 'number'),
       seen: sanitizeRecord(parsed.seen, (v): v is string[] => Array.isArray(v) && v.every((x) => typeof x === 'string')),
